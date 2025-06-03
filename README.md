@@ -1,3 +1,15 @@
+# PicoCalc port of pshell
+
+- Added LCD and Keyboard drivers
+- Added terminal emulator from https://github.com/ncrawforth/VT2040
+- Fixed resolution and writing to flash (pico1)
+
+Known bugs:
+- Arrow keys are not working, use hjkl for navigation in vi
+
+Flash uf2 from releases.
+
+----------------------------------
 A tiny Raspberry Pico and Pico2 shell with flash file system, Vi, and C compiler.
 
 This project explores to what extent a reasonably competent self-hosted programming environment can be built on a modern embedded SoC.
