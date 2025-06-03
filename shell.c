@@ -36,8 +36,8 @@
 
 #define VT_ESC "\033"
 #define VT_CLEAR VT_ESC "[H" VT_ESC "[J"
-#define VT_BLINK VT_ESC "[5m"
-#define VT_BOLD VT_ESC "[1m"
+#define VT_BLINK VT_ESC "[31m"
+#define VT_BOLD VT_ESC "[32m"
 #define VT_NORMAL VT_ESC "[m"
 
 typedef char buf_t[128];
@@ -47,7 +47,7 @@ extern char __heap_end;
 
 buf_t result;
 
-static uint32_t screen_x = 80, screen_y = 24;
+static uint32_t screen_x = 53, screen_y = 40;
 static lfs_file_t file;
 static buf_t cmd_buffer, path, curdir = "/";
 static int argc;
@@ -62,6 +62,9 @@ static void set_translate_crlf(bool enable) {
 #endif
 #if LIB_PICO_STDIO_USB
     driver = &stdio_usb;
+#endif
+#if LIB_PICO_STDIO_PICOCALC
+    driver = &stdio_picocalc;
 #endif
     stdio_set_translate_crlf(driver, enable);
 }
@@ -845,6 +848,10 @@ static void version_cmd(void) {
 }
 
 static bool cursor_pos(uint32_t* x, uint32_t* y) {
+    *x = 53;
+    *y = 40;
+    return true;
+
     int rc = false;
     *x = 80;
     *y = 24;
@@ -1015,15 +1022,29 @@ static bool run_as_cmd(const char* dir) {
     return true;
 }
 
+#include "picocalc_drivers/lcd.h"
+#include "picocalc_drivers/keyboard.h"
+#include "picocalc_drivers/term.h"
+#include "picocalc_drivers/draw.h"
+
 // application entry point
 int main(void) {
     // initialize the pico SDK
-    stdio_init_all();
+    //stdio_init_all();
+
+    lcd_init();
+    lcd_clear();
+    lcd_on();
+    keyboard_init();
+    stdio_picocalc_init();
+    lcd_start_term_framebuffer();
+
+    printf("startup\n");
     bool uart = true;
 #if LIB_PICO_STDIO_USB
-    while (!stdio_usb_connected())
+    /*while (!stdio_usb_connected())
         sleep_ms(1000);
-    uart = false;
+    uart = false;*/
 #endif
     ((int*)scb_hw->vtor)[3] = (int)Fault_Handler; // Hard fault
 #if PICO_RP2350

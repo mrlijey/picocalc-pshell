@@ -154,8 +154,8 @@ enum {
 // See "Xterm Control Sequences"
 #define ESC "\033"
 // Inverse/Normal text
-#define ESC_BOLD_TEXT ESC "[7m"
-#define ESC_NORM_TEXT ESC "[m"
+#define ESC_BOLD_TEXT ESC "[32m"
+#define ESC_NORM_TEXT ESC "[0m"
 // Bell
 #define ESC_BELL "\007"
 // Clear-to-end-of-line
@@ -3744,7 +3744,7 @@ int vi(int ac, char* argv[]) {
     }
 
     // "Save cursor, use alternate screen buffer, clear screen"
-    puts_no_eol(ESC "[?1049h");
+    //puts_no_eol(ESC "[?1049h");
     fflush(stdout);
     // This is the main file handling loop
     if (argc == 0)
@@ -3764,7 +3764,7 @@ done:
     if (last_search_pattern)
         free(last_search_pattern);
     // "Use normal screen buffer, restore cursor"
-    puts_no_eol(ESC "[?1049l");
+    //puts_no_eol(ESC "[?1049l");
     fflush(stdout);
     return 0;
 }

@@ -12,6 +12,7 @@
  *
  */
 
+#include "pico/flash.h"
 #include "hardware/flash.h"
 #include "hardware/regs/addressmap.h"
 #include "hardware/sync.h"
@@ -68,14 +69,24 @@ static int fs_hal_read(const struct lfs_config* c, lfs_block_t block, lfs_off_t 
     return LFS_ERR_OK;
 }
 
+static void do_flash_prog(void* param) {
+  uint32_t p = ((uint32_t*)param)[0];
+  const void* buffer = ((const void**)param)[1];
+  lfs_size_t size = ((lfs_size_t*)param)[2];
+  flash_range_program(FS_BASE + p, buffer, size);
+}
+
 static int fs_hal_prog(const struct lfs_config* c, lfs_block_t block, lfs_off_t off,
                        const void* buffer, lfs_size_t size) {
     (void)c;
     uint32_t p = (block * fs_cfg.block_size) + off;
     // program with SDK
-    uint32_t ints = save_and_disable_interrupts();
-    flash_range_program(FS_BASE + p, buffer, size);
-    restore_interrupts(ints);
+    //uint32_t ints = save_and_disable_interrupts();
+    //flash_range_program(FS_BASE + p, buffer, size);
+    //restore_interrupts(ints);
+    uint32_t params[3] = {(uint32_t)p, (uint32_t)buffer, (uint32_t)size};
+    int rc = flash_safe_execute(do_flash_prog, params, UINT32_MAX);
+    hard_assert(rc == PICO_OK);
     return LFS_ERR_OK;
 }
 

@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.13)
 
-option(USB_CONSOLE "build for USB console, otherwise UART" ON)
+option(USB_CONSOLE "build for USB console, otherwise UART" OFF)
 option(FORCE_TESTS "build release with tests cmd" OFF)
 
 set(CMAKE_C_STANDARD 11)
@@ -9,6 +9,7 @@ set(CMAKE_CXX_STANDARD 17)
 include($ENV{PICO_SDK_PATH}/external/pico_sdk_import.cmake)
 
 set(PSHELL pshell)
+set(LIB_PICO_STDIO_PICOCALC 1)
 
 project(${PSHELL} C CXX ASM)
 
@@ -28,6 +29,7 @@ add_subdirectory(vi)
 add_subdirectory(cc)
 add_subdirectory(misc)
 add_subdirectory(xymodem)
+add_subdirectory(picocalc_drivers)
 
 if ("${PICO_BOARD}" STREQUAL "vgaboard")
     add_subdirectory(sdio)
@@ -68,6 +70,8 @@ pico_set_program_version(${PSHELL} "${PSHELL_GIT_TAG}")
 target_link_libraries(${PSHELL} PUBLIC
     littlefs disassembler io vi cc misc xymodem
     pico_stdlib pico_rand
+    picocalc_drivers
+    pico_multicore
     hardware_flash hardware_sync hardware_watchdog hardware_timer hardware_gpio
     hardware_pwm hardware_adc hardware_clocks hardware_uart hardware_i2c
     hardware_spi hardware_irq hardware_dma hardware_uart)
