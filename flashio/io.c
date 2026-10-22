@@ -12,7 +12,6 @@
  *
  */
 
-#include "pico/flash.h"
 #include "hardware/flash.h"
 #include "hardware/regs/addressmap.h"
 #include "hardware/sync.h"
