@@ -1,0 +1,37 @@
+name: build-pshell-picocalc
+on:
+  workflow_dispatch:
+  push:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          submodules: recursive
+
+      - name: Install toolchain
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y cmake gcc-arm-none-eabi libnewlib-arm-none-eabi build-essential python3
+
+      - name: Get Pico SDK
+        run: |
+          git clone --depth 1 --branch 1.5.1 https://github.com/raspberrypi/pico-sdk.git $HOME/pico-sdk
+          git -C $HOME/pico-sdk submodule update --init --depth 1
+
+      - name: Build pshell for Pico 1 (RP2040), UART console
+        run: |
+          export PICO_SDK_PATH=$HOME/pico-sdk
+          mkdir build && cd build
+          cmake .. -DUSB_CONSOLE=OFF -DPICO_BOARD=pico -DPICO_PLATFORM=rp2040
+          make -j4
+
+      - name: Upload result
+        uses: actions/upload-artifact@v4
+        with:
+          name: pshell-pico1-reserved-top
+          path: |
+            build/pshell.uf2
+            build/pshell.bin
