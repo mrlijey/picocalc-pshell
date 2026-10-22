@@ -33,6 +33,8 @@ static int fs_hal_erase(const struct lfs_config* c, lfs_block_t block);
 static int fs_hal_sync(const struct lfs_config* c);
 
 #define FS_SIZE (PICO_FLASH_SIZE_BYTES - FS_BASE)
+#define FS_RESERVED_TOP (32 * 1024)
+#define FS_SIZE (PICO_FLASH_SIZE_BYTES - FS_BASE - FS_RESERVED_TOP)
 
 // configuration of the filesystem is provided by this struct
 // for Pico: prog size = 256, block size = 4096, so cache is 8K
